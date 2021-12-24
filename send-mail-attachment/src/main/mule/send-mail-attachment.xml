@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dad49420-d969-4065-9d1f-e09b9df08b81" >
+		<http:listener-connection host="0.0.0.0" port="8066" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="f448d1b4-ba38-4bb8-8362-308b6f1ce2c2" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="0b1d0139-12c0-4b45-a845-3a2723f74a78" >
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="babanna233@gmail.com" password="swathibharath" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<flow name="send-mail-attachmentFlow" doc:id="eb7c1f27-f092-46bd-a239-c291cff9525c" >
+		<http:listener doc:name="Listener" doc:id="a0c3570e-f32f-4476-b614-d70d83e866e6" config-ref="HTTP_Listener_config" path="/attach"/>
+		<set-variable value="#[attributes.queryparams.file]" doc:name="Set Variable" doc:id="4443e70e-5b9b-437f-a182-56443bc39d61" variableName="file"/>
+		<file:read doc:name="Read" doc:id="f91aa896-de27-40d5-b65c-c18a18835505" config-ref="File_Config" path="C:\Users\HP\Desktop\target\update.txt"/>
+		<email:send doc:name="Send" doc:id="8f4369a9-08a8-4acf-887a-b85a35f638d3" config-ref="Email_SMTP" fromAddress="babanna233@gmail.com" subject="gmail from smtp">
+			<email:to-addresses >
+				<email:to-address value="swathim233@gmail.com" />
+			</email:to-addresses>
+			<email:body >
+				<email:content ><![CDATA[please find attach file]]></email:content>
+			</email:body>
+			<email:attachments ><![CDATA[#[{
+	"attachment.txt" :payload
+}]]]></email:attachments>
+		</email:send>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="1748d9fe-ed72-46d0-8c0a-774450a19735" />
+	</flow>
+</mule>
